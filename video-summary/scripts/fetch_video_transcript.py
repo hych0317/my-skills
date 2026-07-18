@@ -2,7 +2,7 @@
 """
 Fetch a video's transcript by downloading audio and running Whisper ASR.
 
-This script supports YouTube and Bilibili URLs and uses ASR directly.
+This script supports YouTube, Bilibili, and Douyin URLs and uses ASR directly.
 """
 
 from __future__ import annotations
@@ -21,6 +21,7 @@ from pathlib import Path
 WHISPER_MODEL = None
 WHISPER_MODEL_KEY = None
 DEFAULT_BILIBILI_COOKIES = Path(__file__).resolve().parents[4] / "private" / "bilibili_cookies.txt"
+DEFAULT_DOUYIN_COOKIES = Path(__file__).resolve().parents[4] / "private" / "douyin_cookies.txt"
 DEFAULT_FASTER_WHISPER_MODEL = "mobiuslabsgmbh/faster-whisper-large-v3-turbo"
 DEFAULT_FASTER_WHISPER_COMPUTE_TYPE = "float16"
 DEFAULT_FASTER_WHISPER_BEAM_SIZE = 2
@@ -227,11 +228,18 @@ def is_bilibili_url(url: str) -> bool:
     return "bilibili.com" in host or "b23.tv" in host
 
 
+def is_douyin_url(url: str) -> bool:
+    host = urllib.parse.urlparse(url).netloc.lower()
+    return host == "douyin.com" or host.endswith(".douyin.com")
+
+
 def resolve_cookies_file(url: str, cookies_file: str | None) -> str | None:
     if cookies_file:
         return cookies_file
     if is_bilibili_url(url) and DEFAULT_BILIBILI_COOKIES.exists():
         return str(DEFAULT_BILIBILI_COOKIES)
+    if is_douyin_url(url) and DEFAULT_DOUYIN_COOKIES.exists():
+        return str(DEFAULT_DOUYIN_COOKIES)
     return None
 
 
@@ -424,7 +432,10 @@ def download_video_audio(
         "yt-dlp",
         "--no-playlist",
         "-f",
-        "ba",
+        "ba/worst[acodec!=none]",
+        "-x",
+        "--audio-format",
+        "m4a",
         "-o",
         template,
         url,
@@ -438,6 +449,8 @@ def download_video_audio(
     warning = stderr.strip() or stdout.strip() or "audio download failed"
     if is_bilibili_url(url) and "cookies" in warning.lower():
         warning = "bilibili audio download failed, cookies file may be missing or expired"
+    elif is_douyin_url(url) and "cookies" in warning.lower():
+        warning = "douyin audio download failed, cookies file may be missing or expired"
     elif code != 0 and not warning:
         warning = "audio download failed"
     return None, warning

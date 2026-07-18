@@ -2,8 +2,8 @@
 name: video-summary
 description: >
   Use this for any request to summarize, analyze, extract transcript from, or
-  write about a YouTube/Bilibili/video URL or BV id, including Chinese prompts
-  like "总结视频", "总结这个视频", "视频总结", "提取字幕", "B站视频总结", and "YouTube视频总结".
+  write about a YouTube/Bilibili/Douyin video URL or Bilibili BV id, including Chinese prompts
+  like "总结视频", "总结这个视频", "视频总结", "提取字幕", "B站视频总结", "抖音视频总结", and "YouTube视频总结".
   Use this workflow before producing the answer; resolve short links or pages when
   needed to find the real video URL/BV id, then base the answer on transcript/ASR,
   not webpage title, description, comments, or metadata.
@@ -11,7 +11,7 @@ description: >
 
 # Video Summary
 
-Use this skill to extract a transcript from a YouTube or Bilibili video with ASR, then turn it into the format the user asked for.
+Use this skill to extract a transcript from a YouTube, Bilibili, or Douyin video with ASR, then turn it into the format the user asked for.
 
 ## Trigger Policy
 
@@ -32,6 +32,7 @@ For Bilibili inputs, normalize the input into a standard video URL before extrac
 - Script: `/opt/data/skills/media/video-summary/scripts/fetch_video_transcript.py`
 - `HF_HOME=/opt/hf-cache`
 - `HUGGINGFACE_HUB_CACHE=/opt/hf-cache/hub`
+- For Douyin: `/opt/data/private/douyin_cookies.txt` in Netscape cookies.txt format.
 
 ## SOP
 
@@ -52,6 +53,8 @@ Run the helper script once with `--json` and use that JSON as the source of trut
 If the user provides a bare Bilibili `BV` id, convert it to `https://www.bilibili.com/video/BVxxxxxxx/` first.
 
 If the user provides a Bilibili watch-later URL, extract the `bvid` query parameter and convert it to the same standard video URL before running extraction.
+
+For Douyin links, pass the original `v.douyin.com` short link or canonical Douyin URL to the helper. It automatically uses `/opt/data/private/douyin_cookies.txt`; do not expose its contents in tool output or replies.
 
 ```bash
 HF_HOME=/opt/hf-cache HUGGINGFACE_HUB_CACHE=/opt/hf-cache/hub /usr/bin/python3 /opt/data/skills/media/video-summary/scripts/fetch_video_transcript.py --url "https://www.youtube.com/watch?v=VIDEO_ID" --output-dir /tmp/video-summary --json
