@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prompt Builder"
+  short_description: "Create execution contracts and cross-session handoffs."
+  default_prompt: "Use $prompt-builder to create a reusable execution contract or cross-session handoff."
