@@ -8,7 +8,7 @@
 
 - `grill-skill/`：用于在执行前澄清需求、确认边界的 Skill
 - `prompt-builder/`：用于生成结构化需求契约或 Session Handoff 的 Skill
-- `media/video-summary/`：用于视频转录与总结的 Skill
+- `media/video-summary/`：用于视频转录与总结的 Skill（需要本地部署whisper模型）
 
 ## 适用场景
 
