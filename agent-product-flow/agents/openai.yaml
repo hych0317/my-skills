@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Product Flow"
+  short_description: "Guide agent teams from idea through independent review"
+  default_prompt: "Use $agent-product-flow to take this product idea from framing through implementation and independent review."
